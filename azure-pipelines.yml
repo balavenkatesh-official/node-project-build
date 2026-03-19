@@ -57,6 +57,7 @@ stages:
           packageForLinux: '$(System.ArtifactsDirectory)/drop/app.zip'
           RuntimeStack: 'NODE|22-lts'
           DeploymentTypeLinux: 'oneDeploy'    
+          StartupCommand: 'npm install && node server.js'   # ← add this
 
     # - task: AzureRmWebAppDeployment@5
     #   inputs:
