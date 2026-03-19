@@ -35,20 +35,21 @@ if (fs.existsSync(BUILD)) {
   console.log('  🗑  Cleaned old /build\n');
 }
 
-// Copy public/ → build/public/  (keeps server.js paths working)
+// Copy public/ → build/public/  ← keeps server.js paths intact
 console.log('📁 Copying public files:');
 copyDir(SRC, path.join(BUILD, 'public'));
 
-// Minify HTML
+// Minify HTML inside build/public/
 console.log('\n⚡ Minifying HTML:');
-const htmlFiles = fs.readdirSync(path.join(BUILD, 'public')).filter(f => f.endsWith('.html'));
-for (const file of htmlFiles) {
-  const filePath = path.join(BUILD, 'public', file);
-  fs.writeFileSync(filePath, minifyHTML(fs.readFileSync(filePath, 'utf-8')));
-  console.log(`  ⚡ Minified: ${file}`);
-}
+fs.readdirSync(path.join(BUILD, 'public'))
+  .filter(f => f.endsWith('.html'))
+  .forEach(file => {
+    const fp = path.join(BUILD, 'public', file);
+    fs.writeFileSync(fp, minifyHTML(fs.readFileSync(fp, 'utf-8')));
+    console.log(`  ⚡ Minified: ${file}`);
+  });
 
-// Copy server.js and package.json to build root
+// Copy server.js + package.json → build root  ← THIS WAS MISSING
 console.log('\n📦 Copying server files:');
 ['server.js', 'package.json'].forEach(file => {
   fs.copyFileSync(path.join(ROOT, file), path.join(BUILD, file));
