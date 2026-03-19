@@ -31,24 +31,33 @@ stages:
         publishLocation: 'Container'
 #-------------------------------------------------------------------------------------
 
-- stage: Deploy
-  dependsOn: Build
-  jobs:
-  - job: Deploy
-    pool:
-      name: 'self-hosted'
+# - stage: Deploy
+#   dependsOn: Build
+#   jobs:
+#   - job: Deploy
+#     pool:
+#       name: 'self-hosted'
       
-    steps:
-    - download: current
-      artifact: drop
-    - task: AzureRmWebAppDeployment@5
-      inputs:
-        ConnectionType: 'AzureRM'
-        azureSubscription: 'Azure subscription 1(281d6df1-9dfc-46bb-a0e9-46971c2d4d33)'
-        appType: 'webAppLinux'
-        WebAppName: 'simple-application'
-        packageForLinux: '$(System.DefaultWorkingDirectory)/drop/app.zip'
-        RuntimeStack: 'NODE|22-lts'
-        DeploymentTypeLinux: 'oneDeploy'
+#     steps:
+#     - download: current
+#       artifact: drop
+#     - task: AzureRmWebAppDeployment@5
+#       inputs:
+#         ConnectionType: 'AzureRM'
+#         azureSubscription: 'Azure subscription 1(281d6df1-9dfc-46bb-a0e9-46971c2d4d33)'
+#         appType: 'webAppLinux'
+#         WebAppName: 'simple-application'
+#         packageForLinux: '$(System.DefaultWorkingDirectory)/drop/app.zip'
+#         RuntimeStack: 'NODE|22-lts'
+#         DeploymentTypeLinux: 'oneDeploy'
+#     - task: AzureRmWebAppDeployment@5
+#       inputs:
+#         ConnectionType: 'AzureRM'
+#         azureSubscription: 'Azure subscription 1(281d6df1-9dfc-46bb-a0e9-46971c2d4d33)'
+#         appType: 'webAppLinux'
+#         WebAppName: 'simple-project'
+#         packageForLinux: '$(System.DefaultWorkingDirectory)/drop/app.zip'
+#         RuntimeStack: 'NODE|22-lts'
+#         DeploymentTypeLinux: 'oneDeploy'
 
         
