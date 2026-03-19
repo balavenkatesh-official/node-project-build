@@ -8,6 +8,9 @@ stages:
     pool:
       name: 'self-hosted'
     steps:
+    - script: echo "The agent is alive!"
+      displayName: 'Sanity Check'
+      
     - checkout: self
     - task: Npm@1
       inputs:
