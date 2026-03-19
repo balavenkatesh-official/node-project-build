@@ -60,7 +60,7 @@ stages:
         azureSubscription: 'Azure subscription 1(281d6df1-9dfc-46bb-a0e9-46971c2d4d33)'
         appType: 'webAppLinux'
         WebAppName: 'simple-project'
-        packageForLinux: '$(System.DefaultWorkingDirectory)/drop/app.zip'
+        packageForLinux: '$(Build.ArtifactStagingDirectory)/drop/app.zip'
         RuntimeStack: 'NODE|22-lts'
         DeploymentTypeLinux: 'oneDeploy'
 
