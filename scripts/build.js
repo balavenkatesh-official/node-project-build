@@ -1,21 +1,15 @@
-/**
- * build.js — Creates a production-ready /build folder
- * Run with: npm run build
- */
-
 const fs = require('fs');
 const path = require('path');
 
-const SRC = path.join(__dirname, '..', 'public');
-const BUILD = path.join(__dirname, '..', 'build');
+const ROOT  = path.join(__dirname, '..');
+const SRC   = path.join(ROOT, 'public');
+const BUILD = path.join(ROOT, 'build');
 
-// Recursively copy a directory
 function copyDir(src, dest) {
   fs.mkdirSync(dest, { recursive: true });
   const entries = fs.readdirSync(src, { withFileTypes: true });
-
   for (const entry of entries) {
-    const srcPath = path.join(src, entry.name);
+    const srcPath  = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
     if (entry.isDirectory()) {
       copyDir(srcPath, destPath);
@@ -26,47 +20,45 @@ function copyDir(src, dest) {
   }
 }
 
-// Minify HTML (basic — strips comments and excess whitespace)
 function minifyHTML(content) {
   return content
-    .replace(/<!--[\s\S]*?-->/g, '')       // remove HTML comments
-    .replace(/\s{2,}/g, ' ')               // collapse whitespace
-    .replace(/>\s+</g, '><')               // remove space between tags
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/>\s+</g, '><')
     .trim();
 }
 
-// Process HTML files with basic minification
-function processHTML(buildDir) {
-  const files = fs.readdirSync(buildDir).filter(f => f.endsWith('.html'));
-  for (const file of files) {
-    const filePath = path.join(buildDir, file);
-    const content = fs.readFileSync(filePath, 'utf-8');
-    const minified = minifyHTML(content);
-    fs.writeFileSync(filePath, minified, 'utf-8');
-    console.log(`  ⚡ Minified: ${file}`);
-  }
-}
-
-// --- RUN BUILD ---
 console.log('\n🔨 Building project...\n');
 
 // Clean old build
 if (fs.existsSync(BUILD)) {
   fs.rmSync(BUILD, { recursive: true, force: true });
-  console.log('  🗑  Cleaned old /build folder\n');
+  console.log('  🗑  Cleaned old /build\n');
 }
 
-// Copy public files
-console.log('📁 Copying files:');
-copyDir(SRC, BUILD);
+// Copy public/ → build/public/  (server.js uses __dirname/public)
+console.log('📁 Copying public files:');
+copyDir(SRC, path.join(BUILD, 'public'));
 
-// Minify HTML
+// Minify HTML inside build/public/
 console.log('\n⚡ Minifying HTML:');
-processHTML(BUILD);
+fs.readdirSync(path.join(BUILD, 'public'))
+  .filter(f => f.endsWith('.html'))
+  .forEach(file => {
+    const fp = path.join(BUILD, 'public', file);
+    fs.writeFileSync(fp, minifyHTML(fs.readFileSync(fp, 'utf-8')));
+    console.log(`  ⚡ Minified: ${file}`);
+  });
 
-// Copy server.js into build
-const serverSrc = path.join(__dirname, '..', 'server.js');
-const serverDest = path.join(BUILD, '..', 'build', 'server.js');
-// We keep server.js at the root; build only contains static assets.
+// Copy server.js + package.json to build root
+console.log('\n📦 Copying server files:');
+['server.js', 'package.json'].forEach(file => {
+  fs.copyFileSync(path.join(ROOT, file), path.join(BUILD, file));
+  console.log(`  ✔ Copied: ${file}`);
+});
 
-console.log('\n✅ Build complete! Output → /build\n');
+console.log('\n✅ Build complete! Output → /build');
+console.log('   build/server.js');
+console.log('   build/package.json');
+console.log('   build/public/index.html');
+console.log('   build/public/style.css\n');
