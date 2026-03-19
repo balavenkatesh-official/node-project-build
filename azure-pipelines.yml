@@ -41,8 +41,22 @@ stages:
     pool:
       name: 'self-hosted'
     steps:
-    - download: current
-      artifact: drop
+      - download: none  # disable default download behavior
+      - task: DownloadBuildArtifacts@1
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          downloadPath: '$(System.ArtifactsDirectory)'
+
+      - task: AzureRmWebAppDeployment@5
+        inputs:
+          ConnectionType: 'AzureRM'
+          azureSubscription: 'Azure subscription 1(281d6df1-9dfc-46bb-a0e9-46971c2d4d33)'
+          appType: 'webAppLinux'
+          WebAppName: 'simple-project'
+          packageForLinux: '$(System.ArtifactsDirectory)/drop/app.zip'
+          RuntimeStack: 'NODE|22-lts'
+          DeploymentTypeLinux: 'oneDeploy'    
 
     # - task: AzureRmWebAppDeployment@5
     #   inputs:
@@ -54,14 +68,6 @@ stages:
     #     RuntimeStack: 'NODE|22-lts'
     #     DeploymentTypeLinux: 'oneDeploy'
 
-    - task: AzureRmWebAppDeployment@5
-      inputs:
-        ConnectionType: 'AzureRM'
-        azureSubscription: 'Azure subscription 1(281d6df1-9dfc-46bb-a0e9-46971c2d4d33)'
-        appType: 'webAppLinux'
-        WebAppName: 'simple-project'
-        packageForLinux: '$(Build.ArtifactStagingDirectory)/drop/app.zip'
-        RuntimeStack: 'NODE|22-lts'
-        DeploymentTypeLinux: 'oneDeploy'
+
 
         
