@@ -12,13 +12,19 @@ stages:
       displayName: 'Sanity Check'
       
     - checkout: self
+
     - task: Npm@1
       inputs:
         command: 'install'
+
     - task: Npm@1
       inputs:
         command: 'custom'
         customCommand: 'run build'
+
+    - script: ls -la $(Build.SourcesDirectory)/build
+      displayName: 'Verify build folder contents'
+
     - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: '$(Build.SourcesDirectory)/build'
@@ -26,12 +32,13 @@ stages:
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
         replaceExistingArchive: true
-    
+
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)/app.zip'
         ArtifactName: 'drop'
         publishLocation: 'Container'
+
 #-------------------------------------------------------------------------------------
 
 - stage: Deploy
@@ -41,13 +48,15 @@ stages:
     pool:
       name: 'self-hosted'
     steps:
-      - download: none  # disable default download behavior
+      - download: none
+
       - task: DownloadBuildArtifacts@1
         inputs:
           buildType: 'current'
           downloadType: 'single'
           artifactName: 'drop'
           downloadPath: '$(System.ArtifactsDirectory)'
+
       - task: AzureRmWebAppDeployment@5
         inputs:
           ConnectionType: 'AzureRM'
@@ -56,19 +65,5 @@ stages:
           WebAppName: 'simple-project'
           packageForLinux: '$(System.ArtifactsDirectory)/drop/app.zip'
           RuntimeStack: 'NODE|22-lts'
-          DeploymentTypeLinux: 'oneDeploy'    
-          StartupCommand: 'npm install && node server.js'   # ← add this
-
-    # - task: AzureRmWebAppDeployment@5
-    #   inputs:
-    #     ConnectionType: 'AzureRM'
-    #     azureSubscription: 'Azure subscription 1(281d6df1-9dfc-46bb-a0e9-46971c2d4d33)'
-    #     appType: 'webAppLinux'
-    #     WebAppName: 'simple-application'
-    #     packageForLinux: '$(System.DefaultWorkingDirectory)/drop/app.zip'
-    #     RuntimeStack: 'NODE|22-lts'
-    #     DeploymentTypeLinux: 'oneDeploy'
-
-
-
-        
+          DeploymentTypeLinux: 'oneDeploy'
+          StartupCommand: 'npm install && node server.js'
