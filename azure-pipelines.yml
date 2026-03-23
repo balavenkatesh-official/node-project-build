@@ -42,29 +42,29 @@ stages:
 
 #-------------------------------------------------------------------------------------
 
-- stage: Deploy
-  dependsOn: Build
-  jobs:
-  - job: Deploy
-    pool:
-      name: 'self-hosted'
-    steps:
-      - download: none
+# - stage: Deploy
+#   dependsOn: Build
+#   jobs:
+#   - job: Deploy
+#     pool:
+#       name: 'self-hosted'
+#     steps:
+#       - download: none
 
-      - task: DownloadBuildArtifacts@1
-        inputs:
-          buildType: 'current'
-          downloadType: 'single'
-          artifactName: 'drop'
-          downloadPath: '$(System.ArtifactsDirectory)'
+#       - task: DownloadBuildArtifacts@1
+#         inputs:
+#           buildType: 'current'
+#           downloadType: 'single'
+#           artifactName: 'drop'
+#           downloadPath: '$(System.ArtifactsDirectory)'
 
-      - task: AzureRmWebAppDeployment@5
-        inputs:
-          ConnectionType: 'AzureRM'
-          azureSubscription: 'Azure subscription 1(281d6df1-9dfc-46bb-a0e9-46971c2d4d33)'
-          appType: 'webAppLinux'
-          WebAppName: 'simple-project'
-          packageForLinux: '$(System.ArtifactsDirectory)/drop/app.zip'
-          RuntimeStack: 'NODE|22-lts'
-          DeploymentTypeLinux: 'oneDeploy'
-          StartupCommand: 'npm install && node server.js'
+#       - task: AzureRmWebAppDeployment@5
+#         inputs:
+#           ConnectionType: 'AzureRM'
+#           azureSubscription: 'Azure subscription 1(281d6df1-9dfc-46bb-a0e9-46971c2d4d33)'
+#           appType: 'webAppLinux'
+#           WebAppName: 'simple-project'
+#           packageForLinux: '$(System.ArtifactsDirectory)/drop/app.zip'
+#           RuntimeStack: 'NODE|22-lts'
+#           DeploymentTypeLinux: 'oneDeploy'
+#           StartupCommand: 'npm install && node server.js'
