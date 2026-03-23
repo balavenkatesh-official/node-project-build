@@ -65,6 +65,6 @@ stages:
           appType: 'webAppLinux'
           WebAppName: 'simple-project'
           packageForLinux: '$(System.ArtifactsDirectory)/drop/app.zip'
-          RuntimeStack: 'NODE|20-lts'
+          RuntimeStack: 'NODE|22-lts'
           DeploymentTypeLinux: 'oneDeploy'
           StartupCommand: 'npm install && node server.js'
